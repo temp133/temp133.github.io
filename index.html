@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Embed Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="discord-dark-mode">
+  <div class="container">
+    <h1>Discord Embed Generator</h1>
+    <div class="form">
+      <label for="title">Title:</label>
+      <input type="text" id="title" placeholder="Enter title">
+
+      <label for="description">Description:</label>
+      <textarea id="description" placeholder="Enter description"></textarea>
+
+      <label for="color">Color:</label>
+      <input type="color" id="color" value="#7289da">
+
+      <label for="thumbnail">Thumbnail URL:</label>
+      <input type="text" id="thumbnail" placeholder="Enter thumbnail URL">
+
+      <label for="footer">Footer:</label>
+      <input type="text" id="footer" placeholder="Enter footer text">
+
+      <label for="webhook">Webhook URL:</label>
+      <input type="text" id="webhook" placeholder="Enter Discord webhook URL">
+
+      <div class="preview" id="preview"></div>
+    </div>
+
+    <button onclick="sendToWebhook()">Send to Webhook</button>
+  </div>
+
+  <script>
+    function updatePreview() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const color = document.getElementById('color').value;
+      const thumbnail = document.getElementById('thumbnail').value;
+      const footer = document.getElementById('footer').value;
+
+      const embed = {
+        title: title,
+        description: description,
+        color: color,
+        thumbnail: {
+          url: thumbnail
+        },
+        footer: {
+          text: footer
+        }
+      };
+
+      document.getElementById('preview').innerHTML = `
+        <h2>${embed.title}</h2>
+        <p>${embed.description}</p>
+        <img src="${embed.thumbnail.url}" alt="Thumbnail">
+        <p>${embed.footer.text}</p>
+      `;
+    }
+
+    function sendToWebhook() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const color = document.getElementById('color').value;
+      const thumbnail = document.getElementById('thumbnail').value;
+      const footer = document.getElementById('footer').value;
+      const webhookURL = document.getElementById('webhook').value;
+
+      const embed = {
+        title: title,
+        description: description,
+        color: color,
+        thumbnail: {
+          url: thumbnail
+        },
+        footer: {
+          text: footer
+        }
+      };
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          embeds: [embed],
+        }),
+      }).then(response => {
+        if (response.ok) {
+          console.log('Message sent to Discord successfully.');
+        } else {
+          console.error('Failed to send message to Discord. Response status:', response.status);
+        }
+      }).catch(error => {
+        console.error('Error sending message to Discord:', error);
+      });
+    }
+
+    // Update preview when any input changes
+    const inputs = document.querySelectorAll('.form input, .form textarea');
+    inputs.forEach(input => {
+      input.addEventListener('input', updatePreview);
+    });
+  </script>
+</body>
+</html>
